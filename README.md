@@ -1,9 +1,10 @@
 # SoundPress 🔊
 
-A desktop application that plays a sound effect whenever you press a key on your keyboard. Runs on Windows and macOS.
+A keyboard sound effects application that plays sound effects whenever you type. Available as a **Google Chrome Extension (Manifest V3)** and as a standalone desktop app for Windows & macOS.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20macOS-lightgrey.svg)](#how-to-run)
+[![Chrome Extension](https://img.shields.io/badge/Chrome-Extension%20MV3-brightgreen.svg)](#option-1-google-chrome-extension-recommended)
+[![Platform](https://img.shields.io/badge/Platform-Chrome%20%7C%20Windows%20%7C%20macOS-lightgrey.svg)](#how-to-run)
 
 ---
 
@@ -15,95 +16,83 @@ A desktop application that plays a sound effect whenever you press a key on your
 - **Sound Playback Modes**:
   - **Single Sound**: Consistent feedback on every keystroke.
   - **Multiple Sounds (Random Mix)**: Randomly chooses among your checked sounds on every keypress.
-- **Custom Sound Import**: Add your own `.wav` and `.mp3` audio files with one click.
 - **Volume Settings**: Quick selection for Loud (100%), Medium (55%), and Quiet (20%).
 - **Armed Switch**: Quickly silence or reactivate sound effects without quitting the application.
-- **Keystroke Counter**: Displays real-time detected key events so you know the listener is active.
+- **Runs Inside Chrome Only**: When running as a Chrome Extension, SoundPress is **only active while Chrome is open** and immediately stops when Chrome is closed. No background processes remain on your system.
 - **Zero-Latency Polyphonic Playback**: Handles rapid typing (e.g. 100+ WPM) without audio clipping or stuttering.
-- **System Tray Support**: Minimizes to the Windows system tray / notification area to run unobtrusively in the background.
 
 ---
 
 ## 🕹️ How to Run
 
-### Method 1: One-Click Quick Run (Windows Standalone .EXE)
+### Option 1: Google Chrome Extension (Recommended)
 
-If you have the pre-built portable executable in `dist/`:
-1. Double-click `run.bat` (or run `dist\SoundPress.exe`).
-2. The application opens immediately—no installation or .NET runtime needed!
+Load SoundPress directly into Google Chrome in Developer Mode:
 
-> **Note**: If `dist\SoundPress.exe` is not yet downloaded on your system, you can fetch it with one command:
-> ```powershell
-> .\download-windows-binary.ps1
-> ```
+1. Open Google Chrome and enter `chrome://extensions` in the address bar (or go to **Menu ⋮ → Extensions → Manage Extensions**).
+2. Enable **"Developer mode"** via the toggle switch in the top-right corner.
+3. Click the **"Load unpacked"** button in the top-left corner.
+4. Select the **`extension`** folder from this project:
+   ```
+   H:\Projects\SoundPress\extension
+   ```
+5. **Done!** The SoundPress icon (🔊) will appear in your Chrome toolbar.
+6. Open any website (e.g. Google, Docs, Reddit, Wikipedia) and start typing to hear the sound effects!
+7. Click the extension toolbar icon to change sounds, adjust volume, or turn on the multiple-sound randomizer.
+
+> **Note**: As requested, the extension is active **only inside Google Chrome**. When you close Chrome, SoundPress automatically terminates with no leftover background processes on your computer.
 
 ---
 
-### Method 2: Run via Python (Cross-Platform, Zero External Dependencies)
+### Option 2: One-Click Quick Run (Windows Standalone .EXE)
 
-SoundPress includes a native Python application (`app.py`) built with Tkinter, Windows low-level keyboard hooks, and multi-voice MCI audio mixing.
+If you want system-wide sound effects outside of Chrome:
+1. Double-click `run.bat` (or run `dist\SoundPress.exe`).
+2. The application opens immediately—no installation or .NET runtime needed!
+
+---
+
+### Option 3: Run via Python (Cross-Platform)
+
+SoundPress also includes a native Python application (`app.py`) built with Tkinter:
 
 ```bash
 python app.py
 ```
-Or simply double-click `run.bat` (it automatically falls back to Python if `dist\SoundPress.exe` is absent).
-
-**Requirements**:
-- Python 3.10+ (using standard libraries).
 
 ---
 
-### Method 3: Build from C# Source (.NET 10 SDK)
+### Option 4: Build from Source
 
-To build the self-contained single-file Windows executable yourself:
-
-```powershell
-# 1. Generate synthesized WAV sounds
-python generate_sound.py
-
-# 2. Build and publish with .NET 10
-.\windows\build.ps1
-```
-
-The resulting standalone executable will be written to `dist/SoundPress.exe`.
+- **Windows (.NET 10)**:
+  ```powershell
+  python generate_sound.py
+  .\windows\build.ps1
+  ```
+- **macOS (Swift)**:
+  ```bash
+  ./build-dmg.sh
+  ```
 
 ---
 
-### Method 4: Build on macOS (Swift)
-
-Requires macOS 12+, Swift Command Line Tools, and Python 3:
-
-```bash
-# Generate sounds and build DMG package
-./build-dmg.sh
-```
-
-The resulting `.dmg` will be placed in `dist/`.
-> *macOS permissions note*: Grant **Input Monitoring** and **Accessibility** permissions in **System Settings → Privacy & Security**.
-
----
-
-## 🎛️ Controls & UI Guide
+## 🎛️ Extension Controls
 
 | Control | Description |
 |---|---|
-| **Armed** | Checkbox that enables or disables sound playback when typing. |
+| **Armed** | Toggle switch that enables or disables sound playback when typing. |
 | **Multiple sounds** | When enabled, randomly plays one of the selected checked sounds on each keypress. |
 | **Sound List** | Click to select sounds. In single mode, selecting a sound activates it. In multiple mode, check all sounds you want to mix. |
-| **Add Sounds…** | Open file dialog to import custom `.mp3` or `.wav` audio files. |
-| **Remove Sound** | Removes a previously imported custom sound. |
 | **Volume** | Choose Loud (100%), Medium (55%), or Quiet (20%). |
-| **Test Selected Sound** | Plays the selected sound immediately without typing. |
-| **Close Window** | Keeps the application running in the Windows Notification Area / System Tray. Double-click the tray icon to restore or right-click to quit. |
+| **Test Sound** | Plays the selected sound immediately without typing. |
 
 ---
 
 ## 🔒 Privacy & Safety
 
-SoundPress responds only to global key-down events to trigger sound playback.
-- **No Keystroke Logging**: SoundPress **does not** record, save, or transmit the keys you press or text you type.
-- **Offline**: SoundPress makes **zero network requests** during operation.
-- All configuration settings and custom sound files are stored strictly locally in your user profile.
+- **No Keystroke Logging**: SoundPress **never** records, saves, or transmits the keys you press or text you type.
+- **Completely Offline**: SoundPress makes **zero network requests** and transmits zero data.
+- **Isolated to Chrome**: Only listens to keystrokes inside web page tabs while Chrome is open.
 
 ---
 

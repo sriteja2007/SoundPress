@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>SoundPress</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="header">
+    <div class="brand">
+      <img src="../icons/icon-32.png" alt="SoundPress" class="logo">
+      <div>
+        <h1 class="title">SoundPress</h1>
+        <p class="subtitle">Keyboard Sound Effects</p>
+      </div>
+    </div>
+    <span class="chrome-tag">Chrome</span>
+  </div>
+
+  <div class="status-card" id="statusCard">
+    <div class="status-indicator">
+      <span class="dot" id="statusDot"></span>
+      <span class="status-text" id="statusText">Active in Chrome</span>
+    </div>
+    <span class="key-counter" id="keyCounter">0 keys</span>
+  </div>
+
+  <div class="controls-section">
+    <label class="toggle-row">
+      <span class="toggle-label">Armed (Play sounds)</span>
+      <input type="checkbox" id="armedToggle" class="switch">
+    </label>
+
+    <label class="toggle-row">
+      <span class="toggle-label">Multiple sounds (Mix randomly)</span>
+      <input type="checkbox" id="multipleToggle" class="switch">
+    </label>
+  </div>
+
+  <div class="sounds-header">
+    <span class="section-title">Sound Selection</span>
+    <button id="selectAllBtn" class="btn-text" style="display: none;">Select All</button>
+  </div>
+
+  <div class="sounds-container" id="soundsContainer">
+    <!-- Populated dynamically by popup.js -->
+  </div>
+
+  <div class="footer-controls">
+    <div class="volume-group">
+      <label for="volumeSelect" class="control-label">Volume:</label>
+      <select id="volumeSelect" class="select-input">
+        <option value="1.0">Loud (100%)</option>
+        <option value="0.55" selected>Medium (55%)</option>
+        <option value="0.20">Quiet (20%)</option>
+      </select>
+    </div>
+    <button id="testSoundBtn" class="btn-primary">▶ Test Sound</button>
+  </div>
+
+  <div class="footer-note">
+    SoundPress runs exclusively inside Chrome tabs and shuts down completely when Chrome closes.
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
