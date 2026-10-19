@@ -1,0 +1,14 @@
+.DS_Store
+.tools/
+dist/
+*.app/
+*.dmg
+/shotgun.wav
+sounds/
+windows/bin/
+windows/obj/
+*.user
+__pycache__/
+*.pyc
+.vscode/
+.idea/
