@@ -1,5 +1,5 @@
 // SoundPress Content Script (Manifest V3)
-// Intercepts keydown events inside Chrome tabs and triggers low-latency sound playback.
+// Intercepts keydown events inside Chrome tabs and triggers low-latency Web Audio sound playback.
 
 const SOUND_FILES = {
   "gunshotjbudden": "gunshotjbudden.mp3",
@@ -29,6 +29,48 @@ let currentSettings = {
   selected_sound_ids: ["gunshotjbudden"]
 };
 
+// Web Audio API Polyphonic Audio Engine
+let audioCtx = null;
+const soundBuffers = {};
+
+function getAudioContext() {
+  if (!audioCtx) {
+    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+    if (AudioContextClass) {
+      audioCtx = new AudioContextClass();
+    }
+  }
+  if (audioCtx && audioCtx.state === "suspended") {
+    audioCtx.resume();
+  }
+  return audioCtx;
+}
+
+async function loadBuffer(filename) {
+  if (soundBuffers[filename]) return soundBuffers[filename];
+  try {
+    const ctx = getAudioContext();
+    if (!ctx) return null;
+    const url = chrome.runtime.getURL(`sounds/${filename}`);
+    const res = await fetch(url);
+    const arrayBuffer = await res.arrayBuffer();
+    const decoded = await ctx.decodeAudioData(arrayBuffer);
+    soundBuffers[filename] = decoded;
+    return decoded;
+  } catch (err) {
+    return null;
+  }
+}
+
+// Preload the current default sounds
+async function preloadCurrentSounds() {
+  if (!currentSettings.selected_sound_ids) return;
+  for (const id of currentSettings.selected_sound_ids) {
+    const file = SOUND_FILES[id];
+    if (file) loadBuffer(file);
+  }
+}
+
 // Load initial settings
 chrome.storage.local.get(["armed", "multiple_sounds", "volume", "selected_sound_ids"], (data) => {
   if (data.armed !== undefined) currentSettings.armed = data.armed;
@@ -37,6 +79,7 @@ chrome.storage.local.get(["armed", "multiple_sounds", "volume", "selected_sound_
   if (data.selected_sound_ids && data.selected_sound_ids.length > 0) {
     currentSettings.selected_sound_ids = data.selected_sound_ids;
   }
+  preloadCurrentSounds();
 });
 
 // Sync real-time settings changes from popup
@@ -45,47 +88,65 @@ chrome.storage.onChanged.addListener((changes, area) => {
     if (changes.armed) currentSettings.armed = changes.armed.newValue;
     if (changes.multiple_sounds) currentSettings.multiple_sounds = changes.multiple_sounds.newValue;
     if (changes.volume) currentSettings.volume = changes.volume.newValue;
-    if (changes.selected_sound_ids) currentSettings.selected_sound_ids = changes.selected_sound_ids.newValue;
+    if (changes.selected_sound_ids) {
+      currentSettings.selected_sound_ids = changes.selected_sound_ids.newValue;
+      preloadCurrentSounds();
+    }
   }
 });
 
-// Polyphonic local audio cache
-const localPool = [];
-const POOL_MAX = 8;
-let poolIndex = 0;
-for (let i = 0; i < POOL_MAX; i++) {
-  localPool.push(new Audio());
+async function playSound(filename, volume) {
+  try {
+    const ctx = getAudioContext();
+    if (!ctx) {
+      // Fallback
+      fallbackPlay(filename, volume);
+      return;
+    }
+
+    let buffer = soundBuffers[filename];
+    if (!buffer) {
+      buffer = await loadBuffer(filename);
+    }
+
+    if (buffer) {
+      const source = ctx.createBufferSource();
+      source.buffer = buffer;
+      const gain = ctx.createGain();
+      gain.gain.value = Math.max(0.0, Math.min(1.0, volume));
+      source.connect(gain);
+      gain.connect(ctx.destination);
+      source.start(0);
+    } else {
+      fallbackPlay(filename, volume);
+    }
+  } catch (err) {
+    fallbackPlay(filename, volume);
+  }
 }
 
-function playAudio(filename, volume) {
+function fallbackPlay(filename, volume) {
   try {
-    const audio = localPool[poolIndex];
-    poolIndex = (poolIndex + 1) % POOL_MAX;
-    audio.src = chrome.runtime.getURL(`sounds/${filename}`);
+    const audio = new Audio(chrome.runtime.getURL(`sounds/${filename}`));
     audio.volume = Math.max(0.0, Math.min(1.0, volume));
-    audio.currentTime = 0;
-    const promise = audio.play();
-    if (promise !== undefined) {
-      promise.catch(() => {
-        // Fallback to offscreen document if page CSP or autoplay restricts Audio element
-        chrome.runtime.sendMessage({
-          type: "PLAY_SOUND",
-          file: filename,
-          volume: volume
-        });
-      });
-    }
+    audio.play().catch(() => {
+      chrome.runtime.sendMessage({
+        type: "PLAY_SOUND",
+        file: filename,
+        volume: volume
+      }).catch(() => {});
+    });
   } catch {
     chrome.runtime.sendMessage({
       type: "PLAY_SOUND",
       file: filename,
       volume: volume
-    });
+    }).catch(() => {});
   }
 }
 
-// Global keydown event listener
-window.addEventListener("keydown", (e) => {
+// Global keydown event listener on window and document (capture phase)
+function handleKeyEvent(e) {
   if (!currentSettings.armed) return;
   if (!currentSettings.selected_sound_ids || currentSettings.selected_sound_ids.length === 0) return;
 
@@ -99,8 +160,12 @@ window.addEventListener("keydown", (e) => {
   }
 
   const filename = SOUND_FILES[soundId] || "gunshotjbudden.mp3";
-  playAudio(filename, currentSettings.volume);
+  playSound(filename, currentSettings.volume);
 
   // Send non-blocking key pressed notification for counter
   chrome.runtime.sendMessage({ type: "KEY_PRESSED" }).catch(() => {});
-}, true);
+}
+
+// Attach to both window and document to ensure events are captured anywhere on the page
+window.addEventListener("keydown", handleKeyEvent, true);
+document.addEventListener("keydown", handleKeyEvent, true);

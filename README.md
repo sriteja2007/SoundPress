@@ -18,8 +18,11 @@ A keyboard sound effects application that plays sound effects whenever you type.
   - **Multiple Sounds (Random Mix)**: Randomly chooses among your checked sounds on every keypress.
 - **Volume Settings**: Quick selection for Loud (100%), Medium (55%), and Quiet (20%).
 - **Armed Switch**: Quickly silence or reactivate sound effects without quitting the application.
-- **Runs Inside Chrome Only**: When running as a Chrome Extension, SoundPress is **only active while Chrome is open** and immediately stops when Chrome is closed. No background processes remain on your system.
-- **Zero-Latency Polyphonic Playback**: Handles rapid typing (e.g. 100+ WPM) without audio clipping or stuttering.
+- **Plays on ANY Keypress (Not Just Textboxes)**:
+  - Supports letters, numbers, space, enter, backspace, arrow keys, function keys, and shortcuts anywhere on the page.
+- **Integrated New Tab Search**: Opens a dedicated SoundPress New Tab search page (`Ctrl + T`) that immediately captures all search typing with zero setup!
+- **Runs Inside Chrome Only**: SoundPress is **only active while Chrome is open** and immediately stops when Chrome is closed. No background processes remain on your system.
+- **Zero-Latency Polyphonic Playback**: Powered by the Web Audio API buffer engine for instant, overlapping audio with zero lag.
 
 ---
 
@@ -37,42 +40,37 @@ Load SoundPress directly into Google Chrome in Developer Mode:
    H:\Projects\SoundPress\extension
    ```
 5. **Done!** The SoundPress icon (🔊) will appear in your Chrome toolbar.
-6. Open any website (e.g. Google, Docs, Reddit, Wikipedia) and start typing to hear the sound effects!
+6. Open any website (e.g. Google, Docs, Reddit, Wikipedia) or open a New Tab (`Ctrl + T`) and start typing to hear the sound effects!
 7. Click the extension toolbar icon to change sounds, adjust volume, or turn on the multiple-sound randomizer.
 
-> **Note**: As requested, the extension is active **only inside Google Chrome**. When you close Chrome, SoundPress automatically terminates with no leftover background processes on your computer.
+> **Note**: The extension runs **exclusively inside Google Chrome**. When you close Chrome, SoundPress automatically terminates with no leftover background processes on your computer.
 
 ---
 
-### Option 2: One-Click Quick Run (Windows Standalone .EXE)
+### Option 2: Chrome-Bound Companion (For Top Address Bar / Omnibox)
+
+If you also want sound effects while typing in Chrome's **native top address bar (Omnibox)**:
+1. Double-click `run-chrome-soundpress.bat`.
+2. This companion is **strictly bound to Chrome**:
+   - It **only** plays sounds when Google Chrome is the active foreground window.
+   - It captures keystrokes in the top address bar, search bar, and everywhere in Chrome.
+   - When you switch away from Chrome, it is completely silent.
+   - The moment you close Chrome, it **automatically terminates and exits** itself!
+
+---
+
+### Option 3: Full Desktop Standalone App (.EXE)
 
 If you want system-wide sound effects outside of Chrome:
 1. Double-click `run.bat` (or run `dist\SoundPress.exe`).
-2. The application opens immediately—no installation or .NET runtime needed!
 
 ---
 
-### Option 3: Run via Python (Cross-Platform)
-
-SoundPress also includes a native Python application (`app.py`) built with Tkinter:
+### Option 4: Run via Python Desktop GUI
 
 ```bash
 python app.py
 ```
-
----
-
-### Option 4: Build from Source
-
-- **Windows (.NET 10)**:
-  ```powershell
-  python generate_sound.py
-  .\windows\build.ps1
-  ```
-- **macOS (Swift)**:
-  ```bash
-  ./build-dmg.sh
-  ```
 
 ---
 
@@ -92,7 +90,7 @@ python app.py
 
 - **No Keystroke Logging**: SoundPress **never** records, saves, or transmits the keys you press or text you type.
 - **Completely Offline**: SoundPress makes **zero network requests** and transmits zero data.
-- **Isolated to Chrome**: Only listens to keystrokes inside web page tabs while Chrome is open.
+- **Isolated to Chrome**: Only listens to keystrokes while Chrome is active.
 
 ---
 

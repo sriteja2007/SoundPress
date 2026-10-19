@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>New Tab · SoundPress</title>
+  <link rel="stylesheet" href="newtab.css">
+</head>
+<body>
+  <div class="container">
+    <div class="logo-section">
+      <img src="../icons/icon-48.png" alt="SoundPress" class="icon">
+      <h1 class="brand-title">SoundPress</h1>
+      <p class="brand-desc">Keyboard Sound Effects Active · Type anywhere!</p>
+    </div>
+
+    <form class="search-form" id="searchForm" action="https://www.google.com/search" method="GET">
+      <div class="search-box">
+        <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <input 
+          type="text" 
+          name="q" 
+          id="searchInput" 
+          placeholder="Search with Google or enter address..." 
+          autofocus 
+          autocomplete="off" 
+          spellcheck="false"
+        >
+      </div>
+    </form>
+
+    <div class="sound-status-bar">
+      <span class="status-badge" id="statusBadge">🔊 SoundPress: Armed</span>
+      <span class="sound-name-badge" id="soundNameBadge">Sound: Gunshot J Budden</span>
+    </div>
+  </div>
+
+  <script src="newtab.js"></script>
+</body>
+</html>
